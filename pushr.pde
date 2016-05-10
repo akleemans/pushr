@@ -31,7 +31,7 @@ void draw() {
   for (int i = 0; i < lvl1.length; i++) {
     int p = lvl1[i];
     if (debug) println("Adding " + p);
-    //Box b = new Box(p, dim, dim);
+    Box b = new Box(p, dim, dim);
     if (debug) println("Box " + p + " built");
     boxes.add(b);
   }
@@ -62,5 +62,33 @@ class Border {
     stroke(color);
     strokeWeight(3);
     rect(xpos, ypos, w, h);
+  }
+}
+
+class Box {
+  int boxId, w, h;
+
+  Box(int iboxId, int iw, int ih) {
+    boxId = iboxId;
+    w = iw;
+    h = ih;
+  }
+
+  void move(int xdiff, int ydiff) {
+    boxId += xdiff + ydiff * 26;
+    //println("New position of box:" + boxId);
+  }
+
+  void display() {
+    fill(0, 0, 80);
+    h
+    stroke(255);
+    strokeWeight(1);
+    int[] p = getPosition(boxId);
+    rect(p[0], p[1], w, h);
+  }
+
+  int getPos() {
+    return boxId;
   }
 }
