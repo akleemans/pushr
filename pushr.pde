@@ -27,6 +27,27 @@ void setup() {
 // main loop function
 void draw() {
   background(0);
+  if (state == "building") {
+    buildlevel();
+  } else if (state == "level") {
+    outer.display();
+    inner.display();
+    if (debug) {
+      for (int i = 0; i < 26 * 16; i++) {
+        fill(200); // color the text #CCCCCC
+        PFont fontArial = loadFont("arial");
+        textFont(fontArial, 8);
+        text(i, 2 * dim + (i % 26) * dim + 5, 2 * dim + (i - i % 26) / 26 * dim + 10);
+      }
+    }
+    for (int i = 0; i < boxes.size(); i++) {
+      boxes.get(i).display();
+    }
+    p.display();
+  }
+}
+
+void buildlevel() {
   if (debug) println("Building...");
   for (int i = 0; i < lvl1.length; i++) {
     int p = lvl1[i];
