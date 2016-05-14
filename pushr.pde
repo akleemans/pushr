@@ -17,7 +17,7 @@ color white = #FFFFFF;
 color red = #CC0000;
 
 void setup() {
-  state = "building";
+  state = "menu";
   lvl = 0;
   size(width, height);
   outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
@@ -26,6 +26,8 @@ void setup() {
 
 // main loop function
 void draw() {
+  // if state = menu, draw menu
+  
   background(0);
   if (state == "building") {
     buildlevel();
