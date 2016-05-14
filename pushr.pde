@@ -94,6 +94,27 @@ boolean boxThere(int boxId) {
   return false;
 }
 
+boolean moveBoxes(int boxId, int xdiff, int ydiff) {
+  //println("Is there a box at " + (boxId+xdiff+ydiff*26) + "? " + boxThere(boxId+xdiff+ydiff*26));
+  //println("Is there a box at " + (boxId+2*xdiff+2*ydiff*26) + "? " + boxThere(boxId+2*xdiff+2*ydiff*26));
+  if (boxThere(boxId + xdiff + ydiff * 26)) {
+    if (!boxThere(boxId + 2 * xdiff + 2 * ydiff * 26)) {
+      // get correct box
+      for (int i = 0; i < boxes.size(); i++) {
+        if (boxes.get(i).getPos() == boxId + xdiff + ydiff * 26) {
+          //println("box found! moving!");
+          boxes.get(i).move(xdiff, ydiff);
+          break;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 class Border {
   int xpos, ypos, w, h, color;
 
