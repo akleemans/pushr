@@ -27,7 +27,7 @@ void setup() {
 // main loop function
 void draw() {
   // if state = menu, draw menu
-  
+
   background(0);
   if (state == "building") {
     buildlevel();
@@ -97,9 +97,7 @@ boolean boxThere(int boxId) {
 }
 
 boolean moveBoxes(int boxId, int xdiff, int ydiff) {
-  //println("Is there a box at " + (boxId+xdiff+ydiff*26) + "? " + boxThere(boxId+xdiff+ydiff*26));
-  //println("Is there a box at " + (boxId+2*xdiff+2*ydiff*26) + "? " + boxThere(boxId+2*xdiff+2*ydiff*26));
-  if (boxThere(boxId + xdiff + ydiff * 26)) {
+    if (boxThere(boxId + xdiff + ydiff * 26)) {
     if (!boxThere(boxId + 2 * xdiff + 2 * ydiff * 26)) {
       // get correct box
       for (int i = 0; i < boxes.size(); i++) {
