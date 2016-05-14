@@ -60,11 +60,38 @@ void buildlevel() {
   if (debug) println("Finished building!");
 }
 
+void keyPressed() {
+  int d = 2;
+  if (key == CODED) {
+    if (keyCode == UP) {
+      p.move(0, -1);
+    } else if (keyCode == DOWN) {
+      p.move(0, 1);
+    } else if (keyCode == LEFT) {
+      p.move(-1, 0);
+    } else if (keyCode == RIGHT) {
+      p.move(1, 0);
+    }
+  }
+}
+
 int[] getPosition(int boxId) {
   int[] pos = {
     2 * dim + (boxId % 26) * dim, 2 * dim + (boxId - boxId % 26) / 26 * dim
   };
   return pos;
+}
+
+boolean boxThere(int boxId) {
+  //println("searching...");
+  for (int i = 0; i < boxes.size(); i++) {
+    //println(lvl1[i]);
+    if (boxes.get(i).getPos() == boxId) {
+      //println("found!");
+      return true;
+    }
+  }
+  return false;
 }
 
 class Border {
