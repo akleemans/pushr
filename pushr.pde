@@ -1,3 +1,4 @@
+//Box b;
 Border outer, inner;
 
 String state;
@@ -26,10 +27,16 @@ void setup() {
 
 // main loop function
 void draw() {
-  // if state = menu, draw menu
-
   background(0);
-  if (state == "building") {
+  if (state == "menu") {
+    // draw menu
+    fill(200); // color the text #CCCCCC
+    PFont fontArial = loadFont("arial");
+    textFont(fontArial, 20);
+    text("Press Enter to play", width * 0.15, height / 1.2);
+    textFont(fontArial, 50);
+    text("Press Enter to play", width * 0.15, height / 3);
+  } else if (state == "building") {
     buildlevel();
   } else if (state == "level") {
     outer.display();
@@ -63,6 +70,9 @@ void buildlevel() {
 }
 
 void keyPressed() {
+  if (state == "menu" && keyCode == ENTER) {
+    state = "building";
+  }
   int d = 2;
   if (key == CODED) {
     if (keyCode == UP) {
@@ -97,7 +107,9 @@ boolean boxThere(int boxId) {
 }
 
 boolean moveBoxes(int boxId, int xdiff, int ydiff) {
-    if (boxThere(boxId + xdiff + ydiff * 26)) {
+  //println("Is there a box at " + (boxId+xdiff+ydiff*26) + "? " + boxThere(boxId+xdiff+ydiff*26));
+  //println("Is there a box at " + (boxId+2*xdiff+2*ydiff*26) + "? " + boxThere(boxId+2*xdiff+2*ydiff*26));
+  if (boxThere(boxId + xdiff + ydiff * 26)) {
     if (!boxThere(boxId + 2 * xdiff + 2 * ydiff * 26)) {
       // get correct box
       for (int i = 0; i < boxes.size(); i++) {
