@@ -13,6 +13,8 @@ int debug = false;
 int[] lvl1 = {167,  168,  169,  193,  195,  219,  220,  221 };
 boxes = new ArrayList();
 
+Player p;
+
 // colors
 color white = #FFFFFF;
 color red = #CC0000;
@@ -21,6 +23,7 @@ void setup() {
   state = "menu";
   lvl = 0;
   size(width, height);
+  p = new Player(194, dim, dim);
   outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
   inner = new Border(13 * dim, 8 * dim, 3 * dim, 3 * dim, red);
 }
@@ -171,5 +174,34 @@ class Box {
 
   int getPos() {
     return boxId;
+  }
+}
+
+class Player {
+  int boxId, w, h;
+
+  Player(int iboxId, int iw, int ih) {
+    boxId = iboxId;
+    w = iw;
+    h = ih;
+  }
+
+  void move(int xdiff, int ydiff) {
+    //println("move with " + xdiff + "/" + ydiff);
+    //if (xpos+xdiff >= 2*dim && xpos+xdiff < width-2*dim &&
+    //    ypos+ydiff >= 2*dim && ypos+ydiff < height-2*dim ) {
+    if (moveBoxes(boxId, xdiff, ydiff)) {
+      boxId += xdiff + ydiff * 26;
+    }
+    //}
+  }
+
+  void display() {
+    fill(255, 48, 48);
+    stroke(255);
+    strokeWeight(1);
+    int[] p = getPosition(boxId);
+    rect(p[0], p[1], w, h);
+    rect(p[0] + 2, p[1] + 2, w - 4, h - 4);
   }
 }
