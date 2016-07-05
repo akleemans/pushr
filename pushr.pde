@@ -99,10 +99,13 @@ void showIntro(String s, float i, float j) {
         introFC = frameCount;
         substate += 1;
     }
-    fill(230);
+    int c = 230;
+    if (frameCount-introFC <= 30) c = min((frameCount-introFC)*10, 230);
+    if (frameCount-introFC >= 90) c = max(230 - (frameCount-introFC-90)*10, 0);
+    fill(c);
     textFont(font, 50);
     text(s, width * i, height * j);
-    if (frameCount >= introFC + 3*30) substate += 1;
+    if (frameCount >= introFC + 4*30) substate += 1;
 }
 
 void keyPressed() {
