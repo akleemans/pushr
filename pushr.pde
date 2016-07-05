@@ -37,7 +37,7 @@ void draw() {
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
     } else if (state == 1) {
-        if (substate < 2) showIntro("Replacement", 0.23, 0.45);
+        if (substate < 2) showIntro("Substitute", 0.28, 0.45);
         else if (substate == 2) {
             Box b = new Box(12, 7);
             boxes.add(b);
@@ -64,7 +64,6 @@ void draw() {
         if (substate < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (substate == 2) {
             boxes.clear();
-            //int[] lvl1 = {167,  168,  169,  193,  195,  219,  220,  221};
             int[] lvl = {13, 6, 14, 6, 15, 6, 13, 7, 15, 7, 13, 8, 14, 8, 15, 8};
             for (int i = 0; i < lvl.length; i+=2) {
                 Box b = new Box(lvl[i], lvl[i+1]);
@@ -77,15 +76,16 @@ void draw() {
         } else if (substate == 3) {
             display();
             boolean finished = true;
-            for (int i = 0; i < boxes.length; i++) {
+            for (int i = 0; i < boxes.size(); i++) {
                 if (!boxInTarget(boxes.get(i))) {
                     finished = false;
                     break;
                 }
             }
+            println("Finished:" + finished);
             if (!boxInTarget(player) && finished) {
                 inner = new Border(13, 6, 3, 3, green);
-                for (int i = 0; i < boxes.length; i++) boxes.get(0).c = green;
+                for (int i = 0; i < boxes.size(); i++) boxes.get(i).c = green;
                 outroFC = frameCount;
                 substate += 1;
             }
@@ -109,9 +109,11 @@ void draw() {
     }
 }
 
-boolean boxInTarget(Box b) {
-    if (b.x >= inner.x && b.x < (inner.x + inner.w) && b.y >= inner.y && b.y < (inner.y + inner.h)) return true;
-    else return false;
+boolean boxInTarget(Entity b) {
+    if ((b.x >= inner.x) && (b.x < (inner.x + inner.w)) && (b.y >= inner.y) && (b.y < (inner.y + inner.h))) {
+        return true;
+    }
+    else { return false; }
 }
 
 /* display boxes, player and borders */
