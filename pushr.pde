@@ -1,123 +1,110 @@
-//Box b;
-Border outer, inner;
-
-String state;
-int lvl;
+/* @pjs font="Dimitri.ttf"; */
+int state = 0;
+int substate = 0;
 int width = 600;
 int height = 400;
 int dim = 20;
-
 int debug = false;
+PFont font;
+int introFC;
 
-// 26 * 16
-int[] lvl1 = {167,  168,  169,  193,  195,  219,  220,  221 };
-boxes = new ArrayList();
-
-Player p;
+ArrayList boxes = new ArrayList();
+Player player;
+Border outer, inner;
 
 // colors
 color white = #FFFFFF;
 color red = #CC0000;
 
 void setup() {
-  state = "menu";
-  lvl = 0;
+  font = loadFont("Dimitri.ttf", 20);
+  textFont(font);
   size(width, height);
-  p = new Player(194, dim, dim);
-  outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
-  inner = new Border(13 * dim, 8 * dim, 3 * dim, 3 * dim, red);
+  frameRate(30);
 }
 
 // main loop function
 void draw() {
-  background(0);
-  if (state == "menu") {
-    // draw menu
-    fill(200); // color the text #CCCCCC
-    PFont fontArial = loadFont("arial");
-    textFont(fontArial, 20);
-    text("Press Enter to play", width * 0.15, height / 1.2);
-    textFont(fontArial, 50);
-    text("Press Enter to play", width * 0.15, height / 3);
-  } else if (state == "building") {
-    buildlevel();
-  } else if (state == "level") {
-    outer.display();
-    inner.display();
-    if (debug) {
-      for (int i = 0; i < 26 * 16; i++) {
-        fill(200); // color the text #CCCCCC
-        PFont fontArial = loadFont("arial");
-        textFont(fontArial, 8);
-        text(i, 2 * dim + (i % 26) * dim + 5, 2 * dim + (i - i % 26) / 26 * dim + 10);
-      }
+    background(0);
+    if (state == 0) { // menu
+        fill(230);
+        textFont(font, 70);
+        text("Pushr", width * 0.33, height * 0.45);
+        textFont(font, 20);
+        text("Press Enter to play", width * 0.33, height * 0.7);
+    } else if (state == 1) { // level 1
+        if (substate < 2) showIntro("Replacement", 0.23, 0.45); // 0 - begin intro, 1 - show intro
+        else if (substate == 2) { // 2 - init
+            int[] lvl1 = {167,  168,  169,  193,  195,  219,  220,  221};
+            for (int i = 0; i < lvl1.length; i++) {
+                int p = lvl1[i];
+                Box b = new Box(p, dim, dim);
+                boxes.add(b);
+            }
+            player = new Player(194, dim, dim);
+            outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
+            inner = new Border(13 * dim, 8 * dim, 3 * dim, 3 * dim, red);
+            println("Finished initializing...");
+            substate += 1;
+        } else { // 2 - level
+            println("Displaying borders & player.")
+            outer.display();
+            inner.display();
+            for (int i = 0; i < boxes.size(); i++) {
+                boxes.get(i).display();
+            }
+            player.display();
+            // TODO check if level finished
+        }
+    } else if (state == 2) {
+        println("Level 2 to follow...");
     }
-    for (int i = 0; i < boxes.size(); i++) {
-      boxes.get(i).display();
-    }
-    p.display();
-  }
 }
 
-void buildlevel() {
-  if (debug) println("Building...");
-  for (int i = 0; i < lvl1.length; i++) {
-    int p = lvl1[i];
-    if (debug) println("Adding " + p);
-    Box b = new Box(p, dim, dim);
-    if (debug) println("Box " + p + " built");
-    boxes.add(b);
-  }
-  state = "level";
-  if (debug) println("Finished building!");
+void showIntro(String s, float i, float j) {
+    if (substate == 0) {
+        introFC = frameCount;
+        substate += 1;
+    }
+    textFont(font, 50);
+    text(s, width * i, height * j);
+    if (frameCount >= introFC + 3*30) substate += 1;
 }
 
 void keyPressed() {
-  if (state == "menu" && keyCode == ENTER) {
-    state = "building";
-  }
-  int d = 2;
-  if (key == CODED) {
-    if (keyCode == UP) {
-      p.move(0, -1);
-    } else if (keyCode == DOWN) {
-      p.move(0, 1);
-    } else if (keyCode == LEFT) {
-      p.move(-1, 0);
-    } else if (keyCode == RIGHT) {
-      p.move(1, 0);
+    if (state == 0 && keyCode == ENTER) {
+        state = 1;
     }
-  }
+    else {
+        if (key == CODED) {
+            if (keyCode == UP) { player.move(0, -1); }
+            else if (keyCode == DOWN) { player.move(0, 1); }
+            else if (keyCode == LEFT) { player.move(-1, 0); }
+            else if (keyCode == RIGHT) { player.move(1, 0); }
+        }
+    }
 }
 
 int[] getPosition(int boxId) {
-  int[] pos = {
-    2 * dim + (boxId % 26) * dim, 2 * dim + (boxId - boxId % 26) / 26 * dim
-  };
+  int[] pos = { 2 * dim + (boxId % 26) * dim, 2 * dim + (boxId - boxId % 26) / 26 * dim };
   return pos;
 }
 
 boolean boxThere(int boxId) {
-  //println("searching...");
-  for (int i = 0; i < boxes.size(); i++) {
-    //println(lvl1[i]);
-    if (boxes.get(i).getPos() == boxId) {
-      //println("found!");
-      return true;
+    for (int i = 0; i < boxes.size(); i++) {
+        if (boxes.get(i).getPos() == boxId) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 boolean moveBoxes(int boxId, int xdiff, int ydiff) {
-  //println("Is there a box at " + (boxId+xdiff+ydiff*26) + "? " + boxThere(boxId+xdiff+ydiff*26));
-  //println("Is there a box at " + (boxId+2*xdiff+2*ydiff*26) + "? " + boxThere(boxId+2*xdiff+2*ydiff*26));
   if (boxThere(boxId + xdiff + ydiff * 26)) {
     if (!boxThere(boxId + 2 * xdiff + 2 * ydiff * 26)) {
       // get correct box
       for (int i = 0; i < boxes.size(); i++) {
         if (boxes.get(i).getPos() == boxId + xdiff + ydiff * 26) {
-          //println("box found! moving!");
           boxes.get(i).move(xdiff, ydiff);
           break;
         }
@@ -160,7 +147,6 @@ class Box {
 
   void move(int xdiff, int ydiff) {
     boxId += xdiff + ydiff * 26;
-    //println("New position of box:" + boxId);
   }
 
   void display() {
@@ -179,7 +165,6 @@ class Box {
 
 class Player {
   int boxId, w, h;
-
   Player(int iboxId, int iw, int ih) {
     boxId = iboxId;
     w = iw;
@@ -187,13 +172,9 @@ class Player {
   }
 
   void move(int xdiff, int ydiff) {
-    //println("move with " + xdiff + "/" + ydiff);
-    //if (xpos+xdiff >= 2*dim && xpos+xdiff < width-2*dim &&
-    //    ypos+ydiff >= 2*dim && ypos+ydiff < height-2*dim ) {
     if (moveBoxes(boxId, xdiff, ydiff)) {
       boxId += xdiff + ydiff * 26;
     }
-    //}
   }
 
   void display() {
