@@ -7,6 +7,7 @@ int dim = 20;
 int debug = false;
 PFont font;
 int introFC;
+int outroFC;
 
 ArrayList boxes = new ArrayList();
 Player player;
@@ -15,6 +16,8 @@ Border outer, inner;
 // colors
 color white = #FFFFFF;
 color red = #CC0000;
+color blue = #000078;
+color green = #46C846;
 
 void setup() {
   font = loadFont("Dimitri.ttf", 20);
@@ -32,9 +35,41 @@ void draw() {
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (state == 1) { // level 1
-        if (substate < 2) showIntro("Replacement", 0.23, 0.45); // 0 - begin intro, 1 - show intro
-        else if (substate == 2) { // 2 - init
+    } else if (state == 1) {
+        if (substate < 2) showIntro("Replacement", 0.23, 0.45);
+        else if (substate == 2) { // init
+            Box b = new Box(160, 20, 20);
+            boxes.add(b);
+            player = new Player(167, dim, dim);
+            outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
+            inner = new Border(13 * dim, 8 * dim, dim, dim, red);
+            substate += 1;
+        } else if (substate == 3) { //  level
+            outer.display();
+            inner.display();
+            boxes.get(0).display();
+            player.display();
+            if (boxes.get(0).getPos() == 167) {
+                inner = new Border(13 * dim, 8 * dim, dim, dim, green);
+                boxes.get(0).c = green;
+                outroFC = frameCount;
+                substate += 1;
+            }
+        } else if (substate == 4) {
+            outer.display();
+            inner.display();
+            boxes.get(0).display();
+            player.display();
+            if (frameCount >= outroFC + 30) {
+                state += 1;
+                substate = 0;
+            }
+        }
+
+    } else if (state == 2) { // level 2
+        if (substate < 2) showIntro("Pedantic", 0.33, 0.45); // 0 - begin intro, 1 - show intro
+        else if (substate == 2) { // init
+            boxes.clear();
             int[] lvl1 = {167,  168,  169,  193,  195,  219,  220,  221};
             for (int i = 0; i < lvl1.length; i++) {
                 int p = lvl1[i];
@@ -44,10 +79,8 @@ void draw() {
             player = new Player(194, dim, dim);
             outer = new Border(2 * dim, 2 * dim, width - 4 * dim, height - 4 * dim, white);
             inner = new Border(13 * dim, 8 * dim, 3 * dim, 3 * dim, red);
-            println("Finished initializing...");
             substate += 1;
         } else { // 2 - level
-            println("Displaying borders & player.")
             outer.display();
             inner.display();
             for (int i = 0; i < boxes.size(); i++) {
@@ -56,8 +89,8 @@ void draw() {
             player.display();
             // TODO check if level finished
         }
-    } else if (state == 2) {
-        println("Level 2 to follow...");
+    } else if (state == 3) {
+        println("Level 3 to follow...");
     }
 }
 
@@ -66,6 +99,7 @@ void showIntro(String s, float i, float j) {
         introFC = frameCount;
         substate += 1;
     }
+    fill(230);
     textFont(font, 50);
     text(s, width * i, height * j);
     if (frameCount >= introFC + 3*30) substate += 1;
@@ -138,6 +172,7 @@ class Border {
 
 class Box {
   int boxId, w, h;
+  color c = blue;
 
   Box(int iboxId, int iw, int ih) {
     boxId = iboxId;
@@ -150,8 +185,8 @@ class Box {
   }
 
   void display() {
-    fill(0, 0, 80);
-    h
+    //fill(0, 0, 80);
+    fill(c);
     stroke(255);
     strokeWeight(1);
     int[] p = getPosition(boxId);
