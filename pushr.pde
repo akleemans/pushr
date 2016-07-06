@@ -12,7 +12,7 @@ int dim = 20;
 PFont font;
 int introFC;
 int outroFC;
-boolean debug = true;
+boolean debug = false;
 
 ArrayList boxes = new ArrayList();
 Player player;
@@ -20,10 +20,12 @@ Border outer, inner;
 
 color white = #FFFFFF;
 color red = #CC0000;
-color blue = #000078;
+color blue = #1874CD; //#000078;
 color green = #46C846;
 color orange = #FF8040;
 color purple = #8B008B;
+color black = #000000;
+color gray = #606060;
 
 /* Setup before game starts. */
 void setup() {
@@ -36,14 +38,14 @@ void setup() {
 
 /* Main Game Loop. */
 void draw() {
-    background(0);
+    background(black);
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (level == 1) {
+    } else if (level == 101) {
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
             Box b = new Box(12, 7);
@@ -52,10 +54,8 @@ void draw() {
             outer = new Border(10, 5, 8, 5, white);
             inner = new Border(15, 7, 1, 1, red);
             state += 1;
-        } else if (state >= 3) {
-            checkProgress();
-        }
-    } else if (level == 2) {
+        } else if (state >= 3)  checkProgress();
+    } else if (level == 102) {
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (state == 2) {
             boxes.clear();
@@ -68,14 +68,28 @@ void draw() {
             outer = new Border(2, 2, 26, 16, white);
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
-        } else if (state >= 3) {
-            checkProgress();
-        }
-    } else if (level == 3) {
-        println("to be implemented");
+        } else if (state >= 3) checkProgress();
+    } else if (level == 1) {
+        if (state < 2) showIntro("Escape", 0.35, 0.45);
+        else if (state == 2) {
+            boxes.clear();
+            int[] lvl = {9,4,9,5,10,5,10,4,11,4,11,5,12,4,13,4,13,5,14,5,14,4,15,4,16,4,16,
+                5,17,5,17,4,18,4,19,4,19,5,20,5,20,4,17,6,18,6,19,6,20,6,20,7,17,7,16,7,15,
+                6,14,7,13,7,12,7,13,8,11,7,10,7,9,7,9,6,11,6,9,8,11,8,10,9,11,9,12,9,14,9,
+                18,8,19,8,20,8,17,8,17,9,20,9,19,10,20,10,18,11,17,11,17,10,16,12,17,13,18,
+                13,19,14,20,14,20,15,19,15,18,15,17,15,16,14,16,15,15,15,14,15,13,15,20,12,
+                20,11,20,13,9,10,10,10,9,11,11,11,11,12,10,12,9,12,9,13,9,15,9,14,10,15,10,
+                13,12,13,13,13,14,13,15,13,13,11,13,12,12,10,13,10,14,10,15,10,16,10,12,12,15,9};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+            player = new Player(15, 8);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(8, 3, 12, 12, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
     } else if (level == 4) {
-        println("to be implemented");
-    } else if (level == 5) {
         println("to be implemented");
     }
 }
@@ -88,7 +102,7 @@ void checkProgress() {
     if (state == 3) {
         boolean finished = true;
         for (int i = 0; i < boxes.size(); i++) {
-            if (!boxInTarget(boxes.get(i))) {
+            if (!boxInTarget(boxes.get(i)) && boxes.get(i).c == blue) {
                 finished = false;
                 break;
             }
@@ -141,11 +155,11 @@ void showIntro(String s, float i, float j) {
     }
     int c = 230;
     if (frameCount-introFC <= 30) c = min((frameCount-introFC)*10, 230);
-    if (frameCount-introFC >= 90) c = max(230 - (frameCount-introFC-90)*10, 0);
+    if (frameCount-introFC >= 60) c = max(230 - (frameCount-introFC-60)*10, 0);
     fill(c);
     textFont(font, 50);
     text(s, width * i, height * j);
-    if (frameCount >= introFC + 4*30) state += 1;
+    if (frameCount >= introFC + 3*30) state += 1;
 }
 
 /* Check if key has been pressed. */
@@ -167,6 +181,7 @@ void keyPressed() {
 boolean boxThere(int x, int y) {
     for (int i = 0; i < boxes.size(); i++) {
         if (boxes.get(i).x == x && boxes.get(i).y == y) {
+            if (boxes.get(i).c == black) boxes.get(i).c = gray;
             return true;
         }
     }
@@ -232,6 +247,7 @@ class Box extends Entity {
     }
 
     void display() {
+        if (c == black) return;
         fill(c);
         stroke(255);
         strokeWeight(1);
