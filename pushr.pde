@@ -51,20 +51,8 @@ void draw() {
             outer = new Border(10, 5, 8, 5, white);
             inner = new Border(15, 7, 1, 1, red);
             state += 1;
-        } else if (state == 3) {
-            display();
-            if (boxes.get(0).x == 15 && boxes.get(0).y == 7) {
-                inner = new Border(15, 7, 1, 1, green);
-                boxes.get(0).c = green;
-                outroFC = frameCount;
-                state += 1;
-            }
-        } else if (state == 4) {
-            display();
-            if (frameCount >= outroFC + 30) {
-                level += 1;
-                state = 0;
-            }
+        } else if (state >= 3) {
+            checkProgress();
         }
     } else if (level == 2) {
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
@@ -79,27 +67,8 @@ void draw() {
             outer = new Border(2, 2, 26, 16, white);
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
-        } else if (state == 3) {
-            display();
-            boolean finished = true;
-            for (int i = 0; i < boxes.size(); i++) {
-                if (!boxInTarget(boxes.get(i))) {
-                    finished = false;
-                    break;
-                }
-            }
-            if (!boxInTarget(player) && finished) {
-                inner = new Border(13, 6, 3, 3, green);
-                for (int i = 0; i < boxes.size(); i++) boxes.get(i).c = green;
-                outroFC = frameCount;
-                state += 1;
-            }
-        } else if (state == 4) {
-            display();
-            if (frameCount >= outroFC + 30) {
-                level += 1;
-                state = 0;
-            }
+        } else if (state >= 3) {
+            checkProgress();
         }
     } else if (level == 3) {
         println("to be implemented");
@@ -107,6 +76,31 @@ void draw() {
         println("to be implemented");
     } else if (level == 5) {
         println("to be implemented");
+    }
+}
+
+void checkProgress() {
+    display();
+
+    // check if finished
+    if (state == 3) {
+        boolean finished = true;
+        for (int i = 0; i < boxes.size(); i++) {
+            if (!boxInTarget(boxes.get(i))) {
+                finished = false;
+                break;
+            }
+        }
+        if (!boxInTarget(player) && finished) {
+            inner.c = green;
+            for (int i = 0; i < boxes.size(); i++) boxes.get(i).c = green;
+            outroFC = frameCount;
+            state += 1;
+        }
+    }
+    else if (state == 4 && frameCount >= outroFC + 30) {
+        level += 1;
+        state = 0;
     }
 }
 
