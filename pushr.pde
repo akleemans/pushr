@@ -1,6 +1,11 @@
 /* @pjs font="Dimitri.ttf"; */
 int level = 0;
-int state = 0; // 0: initialized, 1: intro text, 2: loading level, 3: gameplay, 4: finished
+int state = 0;
+/*  0: initialized
+    1: intro text
+    2: loading level
+    3: gameplay
+    4: finished  */
 int swidth = 600;
 int sheight = 400;
 int dim = 20;
@@ -12,7 +17,6 @@ ArrayList boxes = new ArrayList();
 Player player;
 Border outer, inner;
 
-// colors
 color white = #FFFFFF;
 color red = #CC0000;
 color blue = #000078;
@@ -20,6 +24,7 @@ color green = #46C846;
 color orange = #FF8040;
 color purple = #8B008B;
 
+/* Setup before game starts. */
 void setup() {
     font = loadFont("Dimitri.ttf", 20);
     textFont(font);
@@ -27,7 +32,7 @@ void setup() {
     frameRate(30);
 }
 
-// main loop function
+/* Main Game Loop. */
 void draw() {
     background(0);
     if (level == 0) { // menu
@@ -47,7 +52,7 @@ void draw() {
             state += 1;
         } else if (state == 3) {
             display();
-            if (boxes.get(0).getPos() == 15+7*26) {
+            if (boxes.get(0).x == 15 && boxes.get(0).y == 7) {
                 inner = new Border(15, 7, 1, 1, green);
                 boxes.get(0).c = green;
                 outroFC = frameCount;
@@ -104,6 +109,7 @@ void draw() {
     }
 }
 
+/* Check if all boxes are in target zone. */
 boolean boxInTarget(Entity b) {
     if ((b.x >= inner.x) && (b.x < (inner.x + inner.w)) && (b.y >= inner.y) && (b.y < (inner.y + inner.h))) {
         return true;
@@ -111,7 +117,7 @@ boolean boxInTarget(Entity b) {
     else { return false; }
 }
 
-/* display boxes, player and borders */
+/* Display boxes, player and borders. */
 void display() {
     outer.display();
     inner.display();
@@ -121,6 +127,7 @@ void display() {
     player.display();
 }
 
+/* Show a fading intro text before a level starts. */
 void showIntro(String s, float i, float j) {
     if (state == 0) {
         introFC = frameCount;
@@ -135,6 +142,7 @@ void showIntro(String s, float i, float j) {
     if (frameCount >= introFC + 4*30) state += 1;
 }
 
+/* Check if key has been pressed. */
 void keyPressed() {
     if (level == 0 && keyCode == ENTER) {
         level = 1;
@@ -149,6 +157,7 @@ void keyPressed() {
     }
 }
 
+/* Check if a box exists at coordinates x, y. */
 boolean boxThere(int x, int y) {
     for (int i = 0; i < boxes.size(); i++) {
         Box b = boxes.get(i);
@@ -159,6 +168,7 @@ boolean boxThere(int x, int y) {
     return false;
 }
 
+/* Move boxes. TODO: needs fixing.*/
 boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
     if (boxThere(x + xdiff, y + ydiff)) {
         if (!boxThere(x + 2 * xdiff, y + 2 * ydiff)) {
@@ -176,6 +186,7 @@ boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
     return true;
 }
 
+/* A basic entity class with constructor and move(). */
 class Entity {
     int x, y, w, h;
     color c;
@@ -190,12 +201,9 @@ class Entity {
         x += xdiff;
         y += ydiff;
     }
-
-    int getPos() {
-        return x + y * 26;
-    }
 }
 
+/* Border class. */
 class Border extends Entity {
     Border(int _x, int _y, int _w, int _h, color _c) {
         super(_x, _y, _w, _h, _c);
@@ -209,6 +217,7 @@ class Border extends Entity {
     }
 }
 
+/* Box class. */
 class Box extends Entity {
     Box(int _x, int _y) {
         super(_x, _y, 1, 1, blue);
@@ -222,6 +231,7 @@ class Box extends Entity {
     }
 }
 
+/* Player class. */
 class Player extends Entity {
     Player(int _x, int _y) {
         super(_x, _y, 1, 1, orange);
