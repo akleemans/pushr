@@ -29,6 +29,7 @@ color purple = #8B008B;
 void setup() {
     font = loadFont("Dimitri.ttf", 20);
     textFont(font);
+    debugFont = createFont("Arial", 8);
     size(swidth, sheight);
     frameRate(30);
 }
@@ -79,6 +80,7 @@ void draw() {
     }
 }
 
+/* Check if player finished level. */
 void checkProgress() {
     display();
 
@@ -118,6 +120,15 @@ void display() {
     inner.display();
     for (int i = 0; i < boxes.size(); i++) {
         boxes.get(i).display();
+    }
+    if (debug) {
+        fill(255);
+        textFont(debugFont, 8);
+        for (int i = 0; i < 30; i++) {
+            for (int j = 0; j < 20; j++) {
+                text(i + "/" + j, i*dim+4, j*dim+dim/2);
+            }
+        }
     }
     player.display();
 }
