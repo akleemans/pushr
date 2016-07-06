@@ -12,6 +12,7 @@ int dim = 20;
 PFont font;
 int introFC;
 int outroFC;
+boolean debug = true;
 
 ArrayList boxes = new ArrayList();
 Player player;
@@ -69,7 +70,7 @@ void draw() {
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (state == 2) {
             boxes.clear();
-            int[] lvl = {13, 6, 14, 6, 15, 6, 13, 7, 15, 7, 13, 8, 14, 8, 15, 8};
+            int[] lvl = {13, 6, 15, 6, 13, 8, 15, 8, 14, 8, 14, 9, 12, 7, 16, 7, 14, 5};
             for (int i = 0; i < lvl.length; i+=2) {
                 Box b = new Box(lvl[i], lvl[i+1]);
                 boxes.add(b);
