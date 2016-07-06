@@ -69,7 +69,7 @@ void draw() {
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 1) {
+    } else if (level == 103) {
         if (state < 2) showIntro("Escape", 0.35, 0.45);
         else if (state == 2) {
             boxes.clear();
@@ -89,7 +89,35 @@ void draw() {
             inner = new Border(8, 3, 12, 12, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 4) {
+    } else if (level == 1) {
+        if (state < 2) showIntro("Hidden", 0.37, 0.45);
+        else if (state == 2) {
+            boxes.clear();
+            int[] lvl = {12, 3, 11, 3, 10, 3, 9, 3, 8, 3, 8, 4, 9, 4, 10, 4, 11,
+                4, 12, 4, 9, 5, 8, 5, 9, 6, 8, 6, 9, 7, 8, 7, 9, 8, 8, 8, 9, 11,
+                8, 11, 9, 12, 8, 12, 9, 13, 8, 13, 9, 14, 8, 14, 8, 16, 8, 15,
+                9, 15, 9, 16, 10, 15, 10, 16, 11, 15, 11, 16, 12, 15, 12, 16,
+                17, 14, 17, 15, 18, 14, 18, 15, 19, 14, 19, 15, 20, 15, 20, 14,
+                21, 14, 21, 15, 21, 13, 20, 13, 21, 12, 20, 12, 21, 11, 20, 11,
+                21, 10, 20, 10, 21, 9, 20, 9, 21, 8, 20, 8, 21, 7, 20, 7, 21,
+                6, 20, 6, 21, 5, 20, 5, 21, 4, 21, 3, 20, 3, 20, 4, 19, 4, 19,
+                3, 18, 3, 18, 4, 17, 4, 17, 3};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                b.c = black;
+                boxes.add(b);
+            }
+            int[] lvl = {6, 8, 6, 11, 23, 8, 23, 11};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+            player = new Player(15, 6);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(15, 10, 2, 2, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
+    } else if (level == 5) {
         println("to be implemented");
     }
 }

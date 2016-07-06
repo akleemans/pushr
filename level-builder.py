@@ -26,7 +26,7 @@ while not done:
             # TODO check if box already exists
             boxes.append([x, y])
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            print ', '.join([str(box[0]+2) + ', ' + str(box[1]+2) for box in boxes])
+            print ','.join([str(box[0]+2) + ',' + str(box[1]+2) for box in boxes])
     
     screen.fill(WHITE)
     for box in boxes: # draw boxes
