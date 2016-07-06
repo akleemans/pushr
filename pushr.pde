@@ -1,6 +1,6 @@
 /* @pjs font="Dimitri.ttf"; */
-int state = 0;
-int substate = 0;
+int level = 0;
+int state = 0; // 0: initialized, 1: intro text, 2: loading level, 3: gameplay, 4: finished
 int swidth = 600;
 int sheight = 400;
 int dim = 20;
@@ -30,39 +30,39 @@ void setup() {
 // main loop function
 void draw() {
     background(0);
-    if (state == 0) { // menu
+    if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (state == 1) {
-        if (substate < 2) showIntro("Substitute", 0.28, 0.45);
-        else if (substate == 2) {
+    } else if (level == 1) {
+        if (state < 2) showIntro("Substitute", 0.28, 0.45);
+        else if (state == 2) {
             Box b = new Box(12, 7);
             boxes.add(b);
             player = new Player(15, 7);
             outer = new Border(10, 5, 8, 5, white);
             inner = new Border(15, 7, 1, 1, red);
-            substate += 1;
-        } else if (substate == 3) {
+            state += 1;
+        } else if (state == 3) {
             display();
             if (boxes.get(0).getPos() == 15+7*26) {
                 inner = new Border(15, 7, 1, 1, green);
                 boxes.get(0).c = green;
                 outroFC = frameCount;
-                substate += 1;
+                state += 1;
             }
-        } else if (substate == 4) {
+        } else if (state == 4) {
             display();
             if (frameCount >= outroFC + 30) {
-                state += 1;
-                substate = 0;
+                level += 1;
+                state = 0;
             }
         }
-    } else if (state == 2) {
-        if (substate < 2) showIntro("Pedantic", 0.33, 0.45);
-        else if (substate == 2) {
+    } else if (level == 2) {
+        if (state < 2) showIntro("Pedantic", 0.33, 0.45);
+        else if (state == 2) {
             boxes.clear();
             int[] lvl = {13, 6, 14, 6, 15, 6, 13, 7, 15, 7, 13, 8, 14, 8, 15, 8};
             for (int i = 0; i < lvl.length; i+=2) {
@@ -72,8 +72,8 @@ void draw() {
             player = new Player(14, 7);
             outer = new Border(2, 2, 26, 16, white);
             inner = new Border(13, 6, 3, 3, red);
-            substate += 1;
-        } else if (substate == 3) {
+            state += 1;
+        } else if (state == 3) {
             display();
             boolean finished = true;
             for (int i = 0; i < boxes.size(); i++) {
@@ -82,29 +82,24 @@ void draw() {
                     break;
                 }
             }
-            println("Finished:" + finished);
             if (!boxInTarget(player) && finished) {
                 inner = new Border(13, 6, 3, 3, green);
                 for (int i = 0; i < boxes.size(); i++) boxes.get(i).c = green;
                 outroFC = frameCount;
-                substate += 1;
+                state += 1;
             }
-        } else if (substate == 4) {
+        } else if (state == 4) {
             display();
             if (frameCount >= outroFC + 30) {
-                state += 1;
-                substate = 0;
+                level += 1;
+                state = 0;
             }
         }
-    } else if (state == 3) {
-        println("Level 3 to follow...");
-    } else if (state == 4) {
-        display();
-        if (frameCount >= outroFC + 30) {
-            state += 1;
-            substate = 0;
-        }
-    } else if (state == 3) {
+    } else if (level == 3) {
+        println("to be implemented");
+    } else if (level == 4) {
+        println("to be implemented");
+    } else if (level == 5) {
         println("to be implemented");
     }
 }
@@ -127,9 +122,9 @@ void display() {
 }
 
 void showIntro(String s, float i, float j) {
-    if (substate == 0) {
+    if (state == 0) {
         introFC = frameCount;
-        substate += 1;
+        state += 1;
     }
     int c = 230;
     if (frameCount-introFC <= 30) c = min((frameCount-introFC)*10, 230);
@@ -137,15 +132,15 @@ void showIntro(String s, float i, float j) {
     fill(c);
     textFont(font, 50);
     text(s, width * i, height * j);
-    if (frameCount >= introFC + 4*30) substate += 1;
+    if (frameCount >= introFC + 4*30) state += 1;
 }
 
 void keyPressed() {
-    if (state == 0 && keyCode == ENTER) {
-        state = 1;
+    if (level == 0 && keyCode == ENTER) {
+        level = 1;
     }
     else {
-        if (substate == 3 && key == CODED) {
+        if (state == 3 && key == CODED) {
             if (keyCode == UP) { player.move(0, -1); }
             else if (keyCode == DOWN) { player.move(0, 1); }
             else if (keyCode == LEFT) { player.move(-1, 0); }
