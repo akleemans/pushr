@@ -160,8 +160,7 @@ void keyPressed() {
 /* Check if a box exists at coordinates x, y. */
 boolean boxThere(int x, int y) {
     for (int i = 0; i < boxes.size(); i++) {
-        Box b = boxes.get(i);
-        if (b.x == x && b.y == y) {
+        if (boxes.get(i).x == x && boxes.get(i).y == y) {
             return true;
         }
     }
@@ -170,19 +169,22 @@ boolean boxThere(int x, int y) {
 
 /* Move boxes. TODO: needs fixing.*/
 boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
+    // check if one box in front
     if (boxThere(x + xdiff, y + ydiff)) {
-        if (!boxThere(x + 2 * xdiff, y + 2 * ydiff)) {
+        // another box after that?
+        if (!boxThere(x + xdiff*2, y + ydiff*2)) {
+            // if no, search for adjacent box and move it
             for (int i = 0; i < boxes.size(); i++) {
-                if (boxes.get(i).x == x + xdiff && boxes.get(i).y + ydiff) {
+                if (boxes.get(i).x == (x + xdiff) && boxes.get(i).y == (y + ydiff)) {
                     boxes.get(i).move(xdiff, ydiff);
                     break;
                 }
             }
             return true;
-            } else {
-                return false;
-            }
+        } else { // 2 boxes in way
+            return false;
         }
+    }
     return true;
 }
 
