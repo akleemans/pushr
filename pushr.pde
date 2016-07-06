@@ -15,6 +15,7 @@ int outroFC;
 boolean debug = false;
 
 ArrayList boxes = new ArrayList();
+ArrayList bg = new ArrayList();
 Player player;
 Border outer, inner;
 
@@ -26,6 +27,7 @@ color orange = #FF8040;
 color purple = #8B008B;
 color black = #000000;
 color gray = #606060;
+color ice = #D4F0FF; //#B5EBF5;
 
 /* Setup before game starts. */
 void setup() {
@@ -89,7 +91,7 @@ void draw() {
             inner = new Border(8, 3, 12, 12, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 1) {
+    } else if (level == 104) {
         if (state < 2) showIntro("Hidden", 0.37, 0.45);
         else if (state == 2) {
             boxes.clear();
@@ -117,7 +119,42 @@ void draw() {
             inner = new Border(15, 10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 5) {
+    } else if (level == 1) { // 5
+        if (state < 2) showIntro("Slippery", 0.33, 0.45);
+        else if (state == 2) {
+            boxes.clear();
+            bg.clear();
+            Rectangle e = new Rectangle(2, 2, 26, 10, ice); // ice
+            bg.add(e);
+            int[] lvl = {4,12,5,12,9,12,10,12,11,13,11,12,12,13,12,12,13,13,13,
+                12,14,12,15,12,16,13,16,12,18,12,17,12,21,12,20,12,22,13,23,12,
+                22,12,24,13,25,14,25,13,24,12,25,12,26,13,26,12,27,12,27,13};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, ice);
+                bg.add(e);
+            }
+
+            int[] lvl = {2,2,3,2,4,2,5,2,5,3,12,3,13,3,13,2,14,2,15,2,16,2,23,2,
+                24,3,27,4,27,5,27,6,26,5,19,2,19,6,15,5,14,7,13,6,9,7,8,8,7,9,8,
+                9,9,10,10,10,11,11,12,10,15,10,16,9,4,9,3,9,2,10,2,11,2,13,3,11,
+                2,12}; // gray
+            for (int i = 0; i < lvl.length; i+=2) {
+                Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, gray);
+                boxes.add(e);
+            }
+
+            int[] lvl = {6,5,19,7,18,7,26,7}; // boxes
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+            player = new Player(11, 16);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(16, 15, 2, 2, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
+
+    } else if (level == 6) { // 5
         println("to be implemented");
     }
 }
@@ -149,29 +186,39 @@ void checkProgress() {
 }
 
 /* Check if all boxes are in target zone. */
-boolean boxInTarget(Entity b) {
+boolean boxInTarget(Rectangle b) {
     if ((b.x >= inner.x) && (b.x < (inner.x + inner.w)) && (b.y >= inner.y) && (b.y < (inner.y + inner.h))) {
         return true;
     }
     else { return false; }
 }
 
+/* Checks if rectangle in another. */
+boolean inBorder(Rectangle a, Rectangle b) {
+    if ((a.x >= b.x) && (a.x < (b.x + b.w)) && (a.y >= b.y) && (a.y < (b.y + b.h))) {
+        return true;
+    }
+    else { return false; }
+}
+
+
+/* Check if box on ice. */
+boolean rectangleOnIce(Rectangle b) {
+    for (int i = 0; i < bg.size(); i++) {
+        Rectangle r = bg.get(i);
+        if (r.c == ice && (b.x >= r.x) && (b.x < (r.x + r.w)) && (b.y >= r.y) && (b.y < (r.y + r.h))) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /* Display boxes, player and borders. */
 void display() {
     outer.display();
     inner.display();
-    for (int i = 0; i < boxes.size(); i++) {
-        boxes.get(i).display();
-    }
-    if (debug) {
-        fill(255);
-        textFont(debugFont, 8);
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 20; j++) {
-                text(i + "/" + j, i*dim+4, j*dim+dim/2);
-            }
-        }
-    }
+    for (int i = 0; i < bg.size(); i++) bg.get(i).display();
+    for (int i = 0; i < boxes.size(); i++) boxes.get(i).display();
     player.display();
 }
 
@@ -205,6 +252,15 @@ void keyPressed() {
     }
 }
 
+/* Gets box from coordinate. */
+Box getBox(int x, int y) {
+    for (int i = 0; i < boxes.size(); i++) {
+        if (boxes.get(i).x == x && boxes.get(i).y == y) {
+            return boxes.get(i);
+        }
+    }
+}
+
 /* Check if a box exists at coordinates x, y. */
 boolean boxThere(int x, int y) {
     for (int i = 0; i < boxes.size(); i++) {
@@ -216,10 +272,12 @@ boolean boxThere(int x, int y) {
     return false;
 }
 
-/* Move boxes. TODO: needs fixing.*/
+/* Move boxes. */
 boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
     // check if one box in front
     if (boxThere(x + xdiff, y + ydiff)) {
+        if (!inBorder(new Box(x + xdiff, y + ydiff), outer)) return false; // box may not leave border
+        if (getBox(x + xdiff, y + ydiff).c == gray) return false; // gray = fixed
         // another box after that?
         if (!boxThere(x + xdiff*2, y + ydiff*2)) {
             // if no, search for adjacent box and move it
@@ -238,11 +296,11 @@ boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
 }
 
 /* A basic entity class with constructor and move(). */
-class Entity {
+class Rectangle {
     int x, y, w, h;
     color c;
 
-    Entity(int _x, int _y, int _w, int _h, color _c) {
+    Rectangle(int _x, int _y, int _w, int _h, color _c) {
         x = _x; y = _y;
         w = _w; h = _h;
         c = _c
@@ -252,10 +310,16 @@ class Entity {
         x += xdiff;
         y += ydiff;
     }
+
+    void display() {
+        noStroke();
+        fill(c);
+        rect(x*dim, y*dim, w*dim, h*dim);
+    }
 }
 
 /* Border class. */
-class Border extends Entity {
+class Border extends Rectangle {
     Border(int _x, int _y, int _w, int _h, color _c) {
         super(_x, _y, _w, _h, _c);
     }
@@ -269,7 +333,7 @@ class Border extends Entity {
 }
 
 /* Box class. */
-class Box extends Entity {
+class Box extends Rectangle {
     Box(int _x, int _y) {
         super(_x, _y, 1, 1, blue);
     }
@@ -284,15 +348,20 @@ class Box extends Entity {
 }
 
 /* Player class. */
-class Player extends Entity {
+class Player extends Rectangle {
     Player(int _x, int _y) {
         super(_x, _y, 1, 1, orange);
     }
 
     void move(int xdiff, int ydiff) {
-        if (moveBoxes(x, y, xdiff, ydiff)) {
+        if (inBorder(new Box(x+xdiff, y+ydiff), outer) && moveBoxes(x, y, xdiff, ydiff)) {
             x += xdiff
             y += ydiff;
+            // check if on ice
+            while (inBorder(new Box(x+xdiff, y+ydiff), outer) && rectangleOnIce(this) && moveBoxes(x, y, xdiff, ydiff)) {
+                x += xdiff
+                y += ydiff;
+            }
         }
     }
 
