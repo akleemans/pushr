@@ -28,6 +28,7 @@ color red = #CC0000;
 color blue = #1874CD; //#000078;
 color green = #46C846;
 color orange = #FF8040;
+color orange2 = #FFBB99;
 color purple = #8B008B;
 color black = #000000;
 color gray = #111111; //#606060;
@@ -59,7 +60,7 @@ void draw() {
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (level == 1) {
+    } else if (level == 101) { // 1
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -70,7 +71,7 @@ void draw() {
             inner = new Border(16, 8, 1, 1, red);
             state += 1;
         } else if (state >= 3)  checkProgress();
-    } else if (level == 102) {
+    } else if (level == 102) { // 2
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -84,7 +85,7 @@ void draw() {
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 103) {
+    } else if (level == 103) { // 3
         if (state < 2) showIntro("Escape", 0.35, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -104,7 +105,7 @@ void draw() {
             inner = new Border(8, 3, 12, 12, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 104) {
+    } else if (level == 104) { // 4
         if (state < 2) showIntro("Hidden", 0.37, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -165,7 +166,7 @@ void draw() {
             inner = new Border(16, 15, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 2) { // 6
+    } else if (level == 106) { // 6
         if (state < 2) showIntro("Corridor", 0.32, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -193,7 +194,27 @@ void draw() {
             inner = new Border(14,10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 7) {
+    } else if (level == 1) { // 7
+        if (state < 2) showIntro("Tetris", 0.35, 0.45);
+        else if (state == 2) {
+            clearLevel();
+            // movable boxes
+            int[] lvl = {15,6,16,6,16,7,16,8,16,10,15,10,15,9,14,9,14,7,14,8,13,8,12,8};
+            for (int i = 0; i < lvl.length; i+=2) {
+                if (i < 8) c = blue;
+                else if (i >= 8 && i < 16) c = purple;
+                else c = green;
+                Box b = new Box(lvl[i], lvl[i+1], c);
+                boxes.add(b);
+            }
+            player = new Player(14,11);
+            outer = new Border(12,5, 6, 10, white);
+            inner = new Border(12,13, 6, 2, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
+    } else if (level == 8) { // 8
+        println("to be implemented");
+    } else if (level == 9) { // 9
         println("to be implemented");
     }
 }
@@ -212,7 +233,10 @@ void checkProgress() {
     if (state == 3) {
         boolean finished = true;
         for (int i = 0; i < boxes.size(); i++) {
-            if (!boxInTarget(boxes.get(i)) && boxes.get(i).c == blue) {
+            if (!boxInTarget(boxes.get(i)) &&
+            ((boxes.get(i).c == blue) ||
+            (boxes.get(i).c == purple) ||
+            (boxes.get(i).c == green)) ) {
                 finished = false;
                 break;
             }
@@ -241,6 +265,7 @@ boolean boxInTarget(Rectangle b) {
 
 /* Checks if rectangle in another. */
 boolean inBorder(Rectangle a, Rectangle b) {
+    //println("comparing:" + a.x + "/" + a.y + " | " + b.x + "/" + b.y);
     if ((a.x >= b.x) && (a.x < (b.x + b.w)) && (a.y >= b.y) && (a.y < (b.y + b.h))) {
         return true;
     }
@@ -315,7 +340,6 @@ void keyPressed() {
 
 /* Check if mouse is clicked and hit one of the buttons*/
 void mouseClicked() {
-    //println("Mouse has been clicked: " + mouseX + "/" + mouseY);
     if (level >= 1 && mouseY > height-32 && mouseY < height-12) {
         if (mouseX > width/2-10 && mouseX < width/2+10) { // restart
             state = 0;
@@ -323,8 +347,6 @@ void mouseClicked() {
             state = 0;
             level += 1;
         } else if (back_available && mouseX > width/2-60 && mouseX < width/2-40) {
-            245/378
-            253/379
             state = 0;
             level -= 1;
         }
@@ -355,7 +377,8 @@ boolean boxThere(int x, int y) {
 boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
     // check if one box in front
     if (boxThere(x + xdiff, y + ydiff)) {
-        if (!inBorder(new Box(x + xdiff, y + ydiff), outer)) return false; // box may not leave border
+        Box b = new Box(x + xdiff*2, y + ydiff*2);
+        if (!inBorder(b, outer)) return false; // box may not leave border
         if (getBox(x + xdiff, y + ydiff).c == gray) return false; // gray = fixed
         // another box after that?
         if (!boxThere(x + xdiff*2, y + ydiff*2)) {
