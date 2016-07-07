@@ -26,8 +26,8 @@ color green = #46C846;
 color orange = #FF8040;
 color purple = #8B008B;
 color black = #000000;
-color gray = #606060;
-color ice = #D4F0FF; //#B5EBF5;
+color gray = #111111; //#606060;
+color ice = #9CCFFC; // #D4F0FF; //#B5EBF5;
 
 /* Setup before game starts. */
 void setup() {
@@ -50,6 +50,7 @@ void draw() {
     } else if (level == 101) {
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
+            clearLevel();
             Box b = new Box(12, 7);
             boxes.add(b);
             player = new Player(15, 7);
@@ -60,7 +61,7 @@ void draw() {
     } else if (level == 102) {
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (state == 2) {
-            boxes.clear();
+            clearLevel();
             int[] lvl = {13, 6, 15, 6, 13, 8, 15, 8, 14, 8, 14, 9, 12, 7, 16, 7, 14, 5};
             for (int i = 0; i < lvl.length; i+=2) {
                 Box b = new Box(lvl[i], lvl[i+1]);
@@ -74,7 +75,7 @@ void draw() {
     } else if (level == 103) {
         if (state < 2) showIntro("Escape", 0.35, 0.45);
         else if (state == 2) {
-            boxes.clear();
+            clearLevel();
             int[] lvl = {9,4,9,5,10,5,10,4,11,4,11,5,12,4,13,4,13,5,14,5,14,4,15,4,16,4,16,
                 5,17,5,17,4,18,4,19,4,19,5,20,5,20,4,17,6,18,6,19,6,20,6,20,7,17,7,16,7,15,
                 6,14,7,13,7,12,7,13,8,11,7,10,7,9,7,9,6,11,6,9,8,11,8,10,9,11,9,12,9,14,9,
@@ -94,7 +95,7 @@ void draw() {
     } else if (level == 104) {
         if (state < 2) showIntro("Hidden", 0.37, 0.45);
         else if (state == 2) {
-            boxes.clear();
+            clearLevel();
             int[] lvl = {12, 3, 11, 3, 10, 3, 9, 3, 8, 3, 8, 4, 9, 4, 10, 4, 11,
                 4, 12, 4, 9, 5, 8, 5, 9, 6, 8, 6, 9, 7, 8, 7, 9, 8, 8, 8, 9, 11,
                 8, 11, 9, 12, 8, 12, 9, 13, 8, 13, 9, 14, 8, 14, 8, 16, 8, 15,
@@ -119,11 +120,10 @@ void draw() {
             inner = new Border(15, 10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 1) { // 5
+    } else if (level == 105) { // 5
         if (state < 2) showIntro("Slippery", 0.33, 0.45);
         else if (state == 2) {
-            boxes.clear();
-            bg.clear();
+            clearLevel();
             Rectangle e = new Rectangle(2, 2, 26, 10, ice); // ice
             bg.add(e);
             int[] lvl = {4,12,5,12,9,12,10,12,11,13,11,12,12,13,12,12,13,13,13,
@@ -137,7 +137,7 @@ void draw() {
             int[] lvl = {2,2,3,2,4,2,5,2,5,3,12,3,13,3,13,2,14,2,15,2,16,2,23,2,
                 24,3,27,4,27,5,27,6,26,5,19,2,19,6,15,5,14,7,13,6,9,7,8,8,7,9,8,
                 9,9,10,10,10,11,11,12,10,15,10,16,9,4,9,3,9,2,10,2,11,2,13,3,11,
-                2,12}; // gray
+                2,12}; // fixed
             for (int i = 0; i < lvl.length; i+=2) {
                 Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, gray);
                 boxes.add(e);
@@ -153,10 +153,43 @@ void draw() {
             inner = new Border(16, 15, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
+    } else if (level == 1) { // 6
+        if (state < 2) showIntro("Corridor", 0.32, 0.45);
+        else if (state == 2) {
+            clearLevel();
+            // fixed boxes
+            int[] lvl = {12,10,12,11,13,11,14,11,15,11,15,10,15,7,15,6,14,6,13,6,12,6,12,7};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box e = new Box(lvl[i], lvl[i+1], gray);
+                boxes.add(e);
+            }
+            // movable boxes
+            int[] lvl = {5,9,5,8,7,8,7,9};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+            // ice
+            int[] lvl = {11,8,11,9,12,8,12,9,13,8,13,9,14,8,14,9,15,8,15,9,16,8,16,9};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, ice);
+                bg.add(e);
+            }
 
-    } else if (level == 6) { // 5
+            player = new Player(9,10);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(13,9, 2, 2, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
+    } else if (level == 7) {
         println("to be implemented");
     }
+}
+
+/* Clears the current level and deletes all entities. */
+void clearLevel() {
+    boxes.clear();
+    bg.clear();
 }
 
 /* Check if player finished level. */
@@ -216,9 +249,9 @@ boolean rectangleOnIce(Rectangle b) {
 /* Display boxes, player and borders. */
 void display() {
     outer.display();
-    inner.display();
     for (int i = 0; i < bg.size(); i++) bg.get(i).display();
     for (int i = 0; i < boxes.size(); i++) boxes.get(i).display();
+    inner.display();
     player.display();
 }
 
@@ -295,6 +328,8 @@ boolean moveBoxes(int x, int y, int xdiff, int ydiff) {
     return true;
 }
 
+/* -------------------------- Classes -------------------------- */
+
 /* A basic entity class with constructor and move(). */
 class Rectangle {
     int x, y, w, h;
@@ -325,7 +360,7 @@ class Border extends Rectangle {
     }
 
     void display() {
-        fill(0, 0, 0);
+        noFill();
         stroke(c);
         strokeWeight(3);
         rect(x*dim, y*dim, w*dim, h*dim);
@@ -336,6 +371,10 @@ class Border extends Rectangle {
 class Box extends Rectangle {
     Box(int _x, int _y) {
         super(_x, _y, 1, 1, blue);
+    }
+
+    Box(int _x, int _y, color _c) {
+        super(_x, _y, 1, 1, _c);
     }
 
     void display() {
