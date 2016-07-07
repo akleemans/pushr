@@ -33,6 +33,7 @@ color purple = #8B008B;
 color black = #000000;
 color gray = #111111; //#606060;
 color ice = #9CCFFC; // #D4F0FF; //#B5EBF5;
+color coil_ice = #9CCFFD; // blocking ice, for mortal coil level
 
 /* Setup before game starts. */
 void setup() {
@@ -55,7 +56,7 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    //level = 3;
+    level = 8;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
@@ -215,7 +216,36 @@ void draw() {
             state += 1;
         } else if (state >= 3) checkProgress();
     } else if (level == 8) { // 8
-        println("to be implemented");
+      if (state < 2) showIntro("Leaving Traces", 0.21, 0.45);
+      else if (state == 2) {
+          clearLevel();
+          // special ice, only once walkable
+          for (int i = 6; i <= 23; i += 1) {
+              for (int j = 5; j <= 15; j += 1) {
+                  Rectangle e = new Rectangle(i, j, 1, 1, coil_ice);
+                  bg.add(e);
+              }
+          }
+
+          int[] lvl = {6,5, 8,5, 9,5, 10,5, 12,5, 13,5, 14,5, 15,5, 16,5, 19,5,
+              22,5, 23,5, 23,6, 23,7, 6,6, 6,9, 6,10, 6,13, 6,14, 6,15,
+              7,15, 10,15, 11,15, 12,15, 13,15, 14,15, 16,15, 17,15, 18,15, 19,15, 20,15,
+              22,15, 23,15, 23,14, 23,13, 23,12, 23,11, 23,10, 23,9, 23,8}; // fixed
+          for (int i = 0; i < lvl.length; i+=2) {
+              Box e = new Box(lvl[i], lvl[i+1], gray);
+              boxes.add(e);
+          }
+
+          int[] lvl = {14,10}; // boxes
+          for (int i = 0; i < lvl.length; i+=2) {
+              Box b = new Box(lvl[i], lvl[i+1]);
+              boxes.add(b);
+          }
+          player = new Player(14, 3);
+          outer = new Border(2, 2, 26, 16, white);
+          inner = new Border(14, 9, 1, 1, red);
+          state += 1;
+      } else if (state >= 3) checkProgress();
     } else if (level == 9) { // 9
         println("to be implemented");
     }
@@ -279,7 +309,7 @@ boolean inBorder(Rectangle a, Rectangle b) {
 boolean rectangleOnIce(Rectangle b) {
     for (int i = 0; i < bg.size(); i++) {
         Rectangle r = bg.get(i);
-        if (r.c == ice && (b.x >= r.x) && (b.x < (r.x + r.w)) && (b.y >= r.y) && (b.y < (r.y + r.h))) {
+        if ((r.c == ice || r.c == coil_ice) && (b.x >= r.x) && (b.x < (r.x + r.w)) && (b.y >= r.y) && (b.y < (r.y + r.h))) {
             return true;
         }
     }
@@ -360,6 +390,15 @@ Box getBox(int x, int y) {
     for (int i = 0; i < boxes.size(); i++) {
         if (boxes.get(i).x == x && boxes.get(i).y == y) {
             return boxes.get(i);
+        }
+    }
+}
+
+/* Gets box from coordinate. */
+Rectangle getBg(int x, int y) {
+    for (int i = 0; i < bg.size(); i++) {
+        if (bg.get(i).x == x && bg.get(i).y == y) {
+            return bg.get(i);
         }
     }
 }
@@ -465,10 +504,13 @@ class Player extends Rectangle {
 
     void move(int xdiff, int ydiff) {
         if (inBorder(new Box(x+xdiff, y+ydiff), outer) && moveBoxes(x, y, xdiff, ydiff)) {
+            if (getBg(x, y) != null && getBg(x, y).c == coil_ice) { boxes.add(new Box(x, y, gray)); }
             x += xdiff
             y += ydiff;
+
             // check if on ice
             while (inBorder(new Box(x+xdiff, y+ydiff), outer) && rectangleOnIce(this) && moveBoxes(x, y, xdiff, ydiff)) {
+                if (getBg(x, y) != null && getBg(x, y).c == coil_ice) { boxes.add(new Box(x, y, gray)); }
                 x += xdiff
                 y += ydiff;
             }
