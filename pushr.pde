@@ -15,6 +15,7 @@ int introFC;
 int outroFC;
 boolean debug = false;
 
+
 ArrayList boxes = new ArrayList();
 ArrayList bg = new ArrayList();
 Player player;
@@ -23,6 +24,7 @@ Border outer, inner;
 PImage restart, forward, back;
 PImage[] controls;
 boolean forward_available = true, back_available = true;
+boolean gravity = false;
 
 color white = #FFFFFF;
 color red = #CC0000;
@@ -57,14 +59,14 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    level = 9;
+    level = 10;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (level == 1) { // 1
+    } else if (level == 1) {
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -89,7 +91,7 @@ void draw() {
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 3) { // 3
+    } else if (level == 3) {
         if (state < 2) showIntro("Escape", 0.35, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -109,7 +111,7 @@ void draw() {
             inner = new Border(9, 4, 12, 12, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 4) { // 4
+    } else if (level == 4) {
         if (state < 2) showIntro("Hidden", 0.37, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -137,7 +139,7 @@ void draw() {
             inner = new Border(15, 10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 5) { // 5
+    } else if (level == 5) {
         if (state < 2) showIntro("Slippery", 0.33, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -170,7 +172,7 @@ void draw() {
             inner = new Border(16, 15, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 6) { // 6
+    } else if (level == 6) {
         if (state < 2) showIntro("Corridor", 0.32, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -198,7 +200,7 @@ void draw() {
             inner = new Border(14,10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 7) { // 7
+    } else if (level == 7) {
         if (state < 2) showIntro("Tetris", 0.35, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -216,7 +218,7 @@ void draw() {
             inner = new Border(12,13, 6, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 8) { // 8
+    } else if (level == 8) {
       if (state < 2) showIntro("Leaving Traces", 0.21, 0.45);
       else if (state == 2) {
           clearLevel();
@@ -247,7 +249,7 @@ void draw() {
           inner = new Border(14, 9, 1, 1, red);
           state += 1;
       } else if (state >= 3) checkProgress();
-    } else if (level == 9) { // 9
+    } else if (level == 9) {
         if (state < 2) showIntro("Entangled", 0.32, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -272,7 +274,73 @@ void draw() {
             inner = new Border(13, 8, 4, 4, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 10) { // 10
+    } else if (level == 10) {
+        if (state < 2) showIntro("Gravity", 0.35, 0.45);
+        else if (state == 2) {
+            clearLevel();
+
+            int[] lvl = {
+                24,7,24,8,23,9,23,10,4,5,6,2,5,2,25,14,6,4,25,12,25,11,26,11,23,
+                3,25,4,26,3,18,2,23,5,25,6,24,5,24,6,26,16,8,5,9,5,10,5,12,5,13,
+                5,14,5,15,5,16,5,17,5,18,5,19,5,12,2,5,7,7,7,8,7,9,7,12,7,13,7,
+                18,7,17,7,16,7,15,7,20,7,21,7,3,9,10,9,11,9,14,9,12,9,13,9,15,9,
+                17,9,19,9,18,9,16,9,2,16,9,12,12,12,11,12,10,12,20,12,15,12,19,
+                12,16,12,13,12,14,12,2,17,21,15,20,15,19,15,17,15,16,15,15,15,14,
+                15,3,14,6,15,9,15,10,15,11,15,12,17,13,15,11,17,10,17,9,17,8,17,
+                6,17,5,17,7,17,4,17,3,17,3,15,22,17,21,17,20,17,19,17,18,17,17,
+                17,16,17,15,17,14,17,13,17,23,17,17,12,18,12,18,15,22,15,24,17,
+                25,16,5,15,5,16,5,14,4,13,3,11,6,16,9,16,10,16,11,16,6,11,5,11,
+                3,7,2,6,2,7,2,10,17,10,13,10,11,10,16,10,25,9,27,8,27,6,20,2,21,
+                2,24,14,26,13,7,15,4,15,4,16,2,12,23,12,7,16 }; // fixed
+
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1], gray);
+                boxes.add(b);
+            }
+
+            int[] lvl = {14,2, 14,3, 14,1, 18,4}; // boxes
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+
+            player = new Player(15, 3);
+
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(7, 15, 7, 3, red);
+            state += 1;
+            gravity = true;
+        } else if (state >= 3) checkProgress();
+    } else if (level == 11) {
+        gravity = false;
+        println('wip');
+    } else if (level == 12) {
+        println('wip');
+    } else if (level == 13) {
+        println('wip');
+    } else if (level == 14) {
+        println('wip');
+    } else if (level == 15) {
+        println('wip');
+    } else if (level == 16) {
+        println('wip');
+    } else if (level == 17) {
+        println('wip');
+    } else if (level == 18) {
+        println('wip');
+    } else if (level == 19) {
+        println('wip');
+    } else if (level == 20) {
+        println('wip');
+    } else if (level == 21) {
+        println('wip');
+    } else if (level == 22) {
+        println('wip');
+    } else if (level == 23) {
+        println('wip');
+    } else if (level == 24) {
+        println('wip');
+    } else if (level == 25) {
         println('wip');
     }
 }
@@ -281,6 +349,7 @@ void draw() {
 void clearLevel() {
     boxes.clear();
     bg.clear();
+    player2 = null;
 }
 
 /* Check if player finished level. */
@@ -344,6 +413,12 @@ boolean rectangleOnIce(Rectangle b) {
 
 /* Display boxes, player and borders. */
 void display() {
+    // do some automatic calculations
+    if (gravity) {
+        player.fall();
+        for (int i = 0; i < boxes.size(); i++) boxes.get(i).fall();
+    }
+
     outer.display();
     for (int i = 0; i < bg.size(); i++) bg.get(i).display();
     for (int i = 0; i < boxes.size(); i++) boxes.get(i).display();
@@ -495,6 +570,13 @@ class Rectangle {
         y += ydiff;
     }
 
+    void fall() {
+        // outer border hardcoded to 2.
+        if (c != gray && getBox(x, y+1) == null && y < 17 && !(player.x == x && player.y == y+1)) {
+            y += 1;
+        }
+    }
+
     void display() {
         noStroke();
         fill(c);
@@ -542,6 +624,7 @@ class Player extends Rectangle {
     }
 
     void move(int xdiff, int ydiff) {
+        if (gravity && ydiff != 0) return;
         if (inBorder(new Box(x+xdiff, y+ydiff), outer) && moveBoxes(x, y, xdiff, ydiff)) {
             if (getBg(x, y) != null && getBg(x, y).c == coil_ice) { boxes.add(new Box(x, y, gray)); }
             x += xdiff
