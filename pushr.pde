@@ -1,5 +1,6 @@
-/* @pjs font="Dimitri.ttf"; */
+/* @pjs font="assets/Dimitri.ttf"; */
 int level = 0;
+int highest_level = 0;
 int state = 0;
 /*  0: initialized
     1: intro text
@@ -18,6 +19,9 @@ ArrayList boxes = new ArrayList();
 ArrayList bg = new ArrayList();
 Player player;
 Border outer, inner;
+PImage restart, forward, back;
+PImage[] controls;
+boolean forward_available = true, back_available = true;
 
 color white = #FFFFFF;
 color red = #CC0000;
@@ -31,9 +35,17 @@ color ice = #9CCFFC; // #D4F0FF; //#B5EBF5;
 
 /* Setup before game starts. */
 void setup() {
-    font = loadFont("Dimitri.ttf", 20);
+    // load fonts and images
+    font = loadFont("assets/Dimitri.ttf", 20);
     textFont(font);
     debugFont = createFont("Arial", 8);
+
+    // image credit to https://design.google.com/icons/
+    restart = loadImage("assets/restart.png");
+    forward = loadImage("assets/forward.png");
+    back = loadImage("assets/back.png");
+    controls = {back, restart, forward};
+
     size(swidth, sheight);
     frameRate(30);
 }
@@ -47,15 +59,15 @@ void draw() {
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (level == 101) {
+    } else if (level == 1) {
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
             clearLevel();
-            Box b = new Box(12, 7);
+            Box b = new Box(13, 8);
             boxes.add(b);
-            player = new Player(15, 7);
-            outer = new Border(10, 5, 8, 5, white);
-            inner = new Border(15, 7, 1, 1, red);
+            player = new Player(16, 8);
+            outer = new Border(11, 6, 8, 5, white);
+            inner = new Border(16, 8, 1, 1, red);
             state += 1;
         } else if (state >= 3)  checkProgress();
     } else if (level == 102) {
@@ -153,24 +165,24 @@ void draw() {
             inner = new Border(16, 15, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 1) { // 6
+    } else if (level == 2) { // 6
         if (state < 2) showIntro("Corridor", 0.32, 0.45);
         else if (state == 2) {
             clearLevel();
             // fixed boxes
-            int[] lvl = {12,10,12,11,13,11,14,11,15,11,15,10,15,7,15,6,14,6,13,6,12,6,12,7};
+            int[] lvl = {13,11,13,12,14,12,15,12,16,12,16,11,16,8,16,7,15,7,14,7,13,7,13,8};
             for (int i = 0; i < lvl.length; i+=2) {
                 Box e = new Box(lvl[i], lvl[i+1], gray);
                 boxes.add(e);
             }
             // movable boxes
-            int[] lvl = {5,9,5,8,7,8,7,9};
+            int[] lvl = {5,8,5,9,5,10,5,11};
             for (int i = 0; i < lvl.length; i+=2) {
                 Box b = new Box(lvl[i], lvl[i+1]);
                 boxes.add(b);
             }
             // ice
-            int[] lvl = {11,8,11,9,12,8,12,9,13,8,13,9,14,8,14,9,15,8,15,9,16,8,16,9};
+            int[] lvl = {12,9,12,10,13,9,13,10,14,9,14,10,15,9,15,10,16,9,16,10,17,9,17,10};
             for (int i = 0; i < lvl.length; i+=2) {
                 Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, ice);
                 bg.add(e);
@@ -178,7 +190,7 @@ void draw() {
 
             player = new Player(9,10);
             outer = new Border(2, 2, 26, 16, white);
-            inner = new Border(13,9, 2, 2, red);
+            inner = new Border(14,10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
     } else if (level == 7) {
@@ -214,6 +226,7 @@ void checkProgress() {
     }
     else if (state == 4 && frameCount >= outroFC + 30) {
         level += 1;
+        highest_level = level;
         state = 0;
     }
 }
@@ -253,6 +266,21 @@ void display() {
     for (int i = 0; i < boxes.size(); i++) boxes.get(i).display();
     inner.display();
     player.display();
+
+    // controls
+    noFill();
+    strokeWeight(1);
+    for (int i = 0; i < controls.length; i++) {
+        if (i == 0 && level == 1) {back_available = false; continue;}
+        if (i == 2 && level >= highest_level) {forward_available = false; continue;}
+        PImage img = controls[i];
+        pushMatrix();
+        translate(width/2-50+i*50, height-22);
+        image(img, -img.width/2, -img.height/2);
+        popMatrix();
+        if (i == 0) back_available = true;
+        if (i == 2) forward_available = true;
+    }
 }
 
 /* Show a fading intro text before a level starts. */
@@ -281,6 +309,24 @@ void keyPressed() {
             else if (keyCode == DOWN) { player.move(0, 1); }
             else if (keyCode == LEFT) { player.move(-1, 0); }
             else if (keyCode == RIGHT) { player.move(1, 0); }
+        }
+    }
+}
+
+/* Check if mouse is clicked and hit one of the buttons*/
+void mouseClicked() {
+    //println("Mouse has been clicked: " + mouseX + "/" + mouseY);
+    if (level >= 1 && mouseY > height-32 && mouseY < height-12) {
+        if (mouseX > width/2-10 && mouseX < width/2+10) { // restart
+            state = 0;
+        } else if (forward_available && mouseX > width/2+40 && mouseX < width/2+60) {
+            state = 0;
+            level += 1;
+        } else if (back_available && mouseX > width/2-60 && mouseX < width/2-40) {
+            245/378
+            253/379
+            state = 0;
+            level -= 1;
         }
     }
 }
