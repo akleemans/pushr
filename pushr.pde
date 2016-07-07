@@ -18,6 +18,7 @@ boolean debug = false;
 ArrayList boxes = new ArrayList();
 ArrayList bg = new ArrayList();
 Player player;
+Player player2;
 Border outer, inner;
 PImage restart, forward, back;
 PImage[] controls;
@@ -56,7 +57,7 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    level = 8;
+    level = 9;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
@@ -247,7 +248,32 @@ void draw() {
           state += 1;
       } else if (state >= 3) checkProgress();
     } else if (level == 9) { // 9
-        println("to be implemented");
+        if (state < 2) showIntro("Entangled", 0.32, 0.45);
+        else if (state == 2) {
+            clearLevel();
+            // room divider
+            for (int i = 14; i <= 15; i += 1) {
+                for (int j = 4; j <= 15; j += 1) {
+                    Box e = new Box(i, j, gray);
+                    boxes.add(e);
+                }
+            }
+
+            int[] lvl = {8,8, 7,9, 6,10, 5,11, 22,8, 23,9, 24,10, 25,11}; // boxes
+            //int[] lvl = {7,8, 8,8, 7,9, 7,10, 6,10, 22,8, 23,8, 23,9, 23,10, 24,10};
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+            player = new Player(3, 5);
+            player2 = new Player(17, 5);
+
+            outer = new Border(2, 4, 26, 12, white);
+            inner = new Border(13, 8, 4, 4, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
+    } else if (level == 10) { // 10
+        println('wip');
     }
 }
 
@@ -323,6 +349,7 @@ void display() {
     for (int i = 0; i < boxes.size(); i++) boxes.get(i).display();
     inner.display();
     player.display();
+    if (player2 != null) { player2.display(); }
 
     // controls
     noFill();
@@ -362,10 +389,22 @@ void keyPressed() {
     }
     else {
         if (state == 3 && key == CODED) {
-            if (keyCode == UP) { player.move(0, -1); }
-            else if (keyCode == DOWN) { player.move(0, 1); }
-            else if (keyCode == LEFT) { player.move(-1, 0); }
-            else if (keyCode == RIGHT) { player.move(1, 0); }
+            if (keyCode == UP) {
+                player.move(0, -1);
+                if (player2 != null) player2.move(0, -1);
+            }
+            else if (keyCode == DOWN) {
+                player.move(0, 1);
+                if (player2 != null) player2.move(0, 1);
+            }
+            else if (keyCode == LEFT) {
+                player.move(-1, 0);
+                if (player2 != null) player2.move(-1, 0);
+            }
+            else if (keyCode == RIGHT) {
+                player.move(1, 0);
+                if (player2 != null) player2.move(1, 0);
+            }
         }
     }
 }
