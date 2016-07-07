@@ -54,13 +54,15 @@ void setup() {
 /* Main Game Loop. */
 void draw() {
     background(black);
+    // for debugging
+    //level = 3;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
         text("Pushr", width * 0.33, height * 0.45);
         textFont(font, 20);
         text("Press Enter to play", width * 0.33, height * 0.7);
-    } else if (level == 101) { // 1
+    } else if (level == 1) { // 1
         if (state < 2) showIntro("Substitute", 0.28, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -71,7 +73,7 @@ void draw() {
             inner = new Border(16, 8, 1, 1, red);
             state += 1;
         } else if (state >= 3)  checkProgress();
-    } else if (level == 102) { // 2
+    } else if (level == 2) { // 2
         if (state < 2) showIntro("Pedantic", 0.33, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -85,7 +87,7 @@ void draw() {
             inner = new Border(13, 6, 3, 3, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 103) { // 3
+    } else if (level == 3) { // 3
         if (state < 2) showIntro("Escape", 0.35, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -102,10 +104,10 @@ void draw() {
             }
             player = new Player(15, 8);
             outer = new Border(2, 2, 26, 16, white);
-            inner = new Border(8, 3, 12, 12, red);
+            inner = new Border(9, 4, 12, 12, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 104) { // 4
+    } else if (level == 4) { // 4
         if (state < 2) showIntro("Hidden", 0.37, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -133,7 +135,7 @@ void draw() {
             inner = new Border(15, 10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 105) { // 5
+    } else if (level == 5) { // 5
         if (state < 2) showIntro("Slippery", 0.33, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -166,7 +168,7 @@ void draw() {
             inner = new Border(16, 15, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 106) { // 6
+    } else if (level == 6) { // 6
         if (state < 2) showIntro("Corridor", 0.32, 0.45);
         else if (state == 2) {
             clearLevel();
@@ -194,7 +196,7 @@ void draw() {
             inner = new Border(14,10, 2, 2, red);
             state += 1;
         } else if (state >= 3) checkProgress();
-    } else if (level == 1) { // 7
+    } else if (level == 7) { // 7
         if (state < 2) showIntro("Tetris", 0.35, 0.45);
         else if (state == 2) {
             clearLevel();
