@@ -34,9 +34,10 @@ color orange = #FF8040;
 color orange2 = #FFBB99;
 color purple = #8B008B;
 color black = #000000;
-color gray = #111111; //#606060;
+color gray = #222222; //#111111 #606060;
 color ice = #9CCFFC; // #D4F0FF; //#B5EBF5;
 color coil_ice = #9CCFFD; // blocking ice, for mortal coil level
+color passage = #8B008B;
 
 /* Setup before game starts. */
 void setup() {
@@ -59,7 +60,7 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    level = 10;
+    level = 11;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
@@ -312,8 +313,42 @@ void draw() {
             gravity = true;
         } else if (state >= 3) checkProgress();
     } else if (level == 11) {
-        gravity = false;
-        println('wip');
+        if (state < 2) showIntro("One-Way", 0.35, 0.45);
+        else if (state == 2) {
+            gravity = false;
+            clearLevel();
+            int[] lvl = { 9,9, 12,4, 18,4, 20,7, 20,12 }; // one-way entries 15,15
+            for (int i = 0; i < lvl.length; i+=2) {
+                Rectangle e = new Rectangle(lvl[i], lvl[i+1], 1, 1, passage);
+                bg.add(e);
+            }
+
+            int[] lvl = { 9,4,10,4,11,4,9,5,10,5,11,5,10,6,9,6,10,7,9,7,9,8,9,10,
+                10,10,9,11,9,12,10,12,9,13,12,14,9,14,9,15,10,15,11,15,12,15,13,
+                15,14,15,16,15,17,15,18,15,18,14,18,12,19,15,20,15,20,14,20,13,
+                20,11,18,10,15,10,14,10,13,10,12,10,13,11,14,9,14,8,14,7,15,6,16,
+                6,13,5,13,4,14,4,15,4,16,4,17,4,19,4,20,4,20,5,20,6,20,8,20,9,20,
+                10,11,14,17,10,16,10,15,11,15,7,16,14,11,7,17,7,16,5,16,12,19,10,
+                15,15 }; // fixed
+
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1], gray);
+                boxes.add(b);
+            }
+
+            int[] lvl = {11,8, 12,7, 18,8, 18,13}; // boxes
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+
+            player = new Player(6, 9);
+
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(13, 8, 3, 2, red);
+            state += 1;
+            gravity = true;
+        } else if (state >= 3) checkProgress();
     } else if (level == 12) {
         println('wip');
     } else if (level == 13) {
@@ -626,13 +661,13 @@ class Player extends Rectangle {
     void move(int xdiff, int ydiff) {
         if (gravity && ydiff != 0) return;
         if (inBorder(new Box(x+xdiff, y+ydiff), outer) && moveBoxes(x, y, xdiff, ydiff)) {
-            if (getBg(x, y) != null && getBg(x, y).c == coil_ice) { boxes.add(new Box(x, y, gray)); }
+            if (getBg(x, y) != null && (getBg(x, y).c == coil_ice || getBg(x, y).c == passage)) { boxes.add(new Box(x, y, gray)); }
             x += xdiff
             y += ydiff;
 
             // check if on ice
             while (inBorder(new Box(x+xdiff, y+ydiff), outer) && rectangleOnIce(this) && moveBoxes(x, y, xdiff, ydiff)) {
-                if (getBg(x, y) != null && getBg(x, y).c == coil_ice) { boxes.add(new Box(x, y, gray)); }
+                if (getBg(x, y) != null && (getBg(x, y).c == coil_ice || getBg(x, y).c == passage)) { boxes.add(new Box(x, y, gray)); }
                 x += xdiff
                 y += ydiff;
             }
