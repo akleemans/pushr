@@ -313,9 +313,10 @@ void draw() {
             gravity = true;
         } else if (state >= 3) checkProgress();
     } else if (level == 11) {
+        gravity = false;
         if (state < 2) showIntro("One-Way", 0.35, 0.45);
         else if (state == 2) {
-            gravity = false;
+
             clearLevel();
             int[] lvl = { 9,9, 12,4, 18,4, 20,7, 20,12 }; // one-way entries 15,15
             for (int i = 0; i < lvl.length; i+=2) {
