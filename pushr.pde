@@ -60,7 +60,7 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    level = 11;
+    level = 12;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
@@ -316,7 +316,6 @@ void draw() {
         gravity = false;
         if (state < 2) showIntro("One-Way", 0.35, 0.45);
         else if (state == 2) {
-
             clearLevel();
             int[] lvl = { 9,9, 12,4, 18,4, 20,7, 20,12 }; // one-way entries 15,15
             for (int i = 0; i < lvl.length; i+=2) {
@@ -348,10 +347,33 @@ void draw() {
             outer = new Border(2, 2, 26, 16, white);
             inner = new Border(13, 8, 3, 2, red);
             state += 1;
-            gravity = true;
         } else if (state >= 3) checkProgress();
     } else if (level == 12) {
-        println('wip');
+        if (state < 2) showIntro("Bulky", 0.38, 0.45);
+        else if (state == 2) {
+            clearLevel();
+            int[] lvl = {4,3,5,4,6,4,6,5,7,4,9,3,9,4,3,6,4,7,5,7,6,7,2,4,5,10,5,
+                11,4,12,5,14,4,15,7,14,8,14,9,14,9,8,10,8,9,9,10,10,11,11,11,7,
+                12,6,13,6,14,6,15,5,15,6,16,6,18,6,18,7,16,11,15,12,16,12,17,12,
+                18,11,19,10,20,10,19,3,22,5,23,5,24,6,25,6,25,4,26,3,27,4,23,2,
+                22,2,21,13,20,13,22,14,23,14,26,14,27,16,27,15,25,8,26,7,26,8,13,
+                15,18,15,17,14,21,4,16,2,12,3,11,2,6,2 }; // fixed
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1], gray);
+                boxes.add(b);
+            }
+
+            int[] lvl = {13,14,23,12,21,8,7,11}; // boxes
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+
+            player = new BulkyPlayer(13, 8, 2);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(15,16, 2, 2, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
     } else if (level == 13) {
         println('wip');
     } else if (level == 14) {
@@ -659,6 +681,10 @@ class Player extends Rectangle {
         super(_x, _y, 1, 1, orange);
     }
 
+    Player(int _x, int _y, int size) {
+        super(_x, _y, size, size, orange);
+    }
+
     void move(int xdiff, int ydiff) {
         if (gravity && ydiff != 0) return;
         if (inBorder(new Box(x+xdiff, y+ydiff), outer) && moveBoxes(x, y, xdiff, ydiff)) {
@@ -681,5 +707,53 @@ class Player extends Rectangle {
         strokeWeight(1);
         rect(x*dim, y*dim, w*dim, h*dim);
         rect(x*dim + 2, y*dim + 2, w*dim - 4, h*dim - 4);
+    }
+}
+
+class BulkyPlayer extends Player {
+
+    BulkyPlayer(int _x, int _y, int size) {
+        super(_x, _y, size);
+    }
+
+    void move(int xdiff, int ydiff) {
+        // check if in border
+        if ((xdiff == -1 || ydiff == -1)) { if (!inBorder(new Box(x+xdiff, y+ydiff), outer)) return; }
+        else if (!inBorder(new Box(x+xdiff*2, y+ydiff*2), outer)) { return; }
+
+        // check if other boxes involved
+        Box b1; // = new Box(x + xdiff*2 + (xdiff == 1 ? 1 : 0), y + ydiff*2 + (ydiff == 1 ? 1 : 0));
+        Box b2;
+        if (xdiff == -1) { b1 = new Box(x-1, y); b2 = new Box(x-1, y+1); }
+        else if (ydiff == -1) { b1 = new Box(x, y-1); b2 = new Box(x+1, y-1); }
+        else if (xdiff == 1) { b1 = new Box(x+2, y); b2 = new Box(x+2, y+1); }
+        else if (ydiff == 1) { b1 = new Box(x, y+2); b2 = new Box(x+1, y+2); }
+
+        // no boxes at all
+        boolean movement = true;
+        if (!boxThere(b1.x, b1.y) && !boxThere(b2.x, b2.y)) {
+            movement = true;
+            // console.log("No box at all.");
+        }
+        // blocking box
+        else if ( (boxThere(b1.x, b1.y) && getBox(b1.x, b1.y).c == gray)
+               || (boxThere(b2.x, b2.y) && getBox(b2.x, b2.y).c == gray)) {
+            movement = false;
+            // console.log("Blocking gray box.");
+        }
+        // two boxes in a row
+        else if ( (boxThere(b1.x, b1.y) && boxThere(b1.x+xdiff, b1.y+ydiff))
+               || (boxThere(b2.x, b2.y) && boxThere(b2.x+xdiff, b2.y+ydiff))) {
+            movement = false;
+            // console.log("Two boxes in a row.");
+        }
+
+        // move
+        if (movement) {
+            if (boxThere(b1.x, b1.y)) getBox(b1.x, b1.y).move(xdiff, ydiff);
+            if (boxThere(b2.x, b2.y)) getBox(b2.x, b2.y).move(xdiff, ydiff);
+            x += xdiff;
+            y += ydiff;
+        }
     }
 }
