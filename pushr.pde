@@ -60,7 +60,7 @@ void setup() {
 void draw() {
     background(black);
     // for debugging
-    level = 12;
+    level = 13;
     if (level == 0) { // menu
         fill(230);
         textFont(font, 70);
@@ -375,7 +375,29 @@ void draw() {
             state += 1;
         } else if (state >= 3) checkProgress();
     } else if (level == 13) {
-        println('wip');
+        if (state < 2) showIntro("Borderless", 0.28, 0.45);
+        else if (state == 2) {
+            clearLevel();
+            int[] lvl = {
+2,6,3,6,4,6,5,6,6,6,7,6,8,6,9,6,10,2,10,3,10,4,10,5,10,6,10,11,9,14,8,14,7,14,7,15,7,17,7,16,6,14,5,14,4,14,3,14,2,14,11,16,11,17,12,16,13,16,15,16,14,16,16,16,17,17,17,16,17,15,11,11,12,11,13,11,14,11,15,11,17,11,18,11,17,12,17,13,17,14,16,11,19,11,19,9,19,8,22,8,19,14,19,15,19,16,19,17,20,14,21,14,22,14,23,15,23,16,23,17,23,14,24,14,25,14,26,14,27,14,27,11,26,11,9,13,9,12,9,11,9,10,9,9,9,8,9,7,13,2,13,3,13,4,20,2,20,3,20,4,27,3,26,3,25,2,25,3,25,4,25,5,25,6,25,7,25,8,25,9,25,10,25,11,22,13,22,11,22,12,22,10,22,9,22,7,21,7,20,7,19,7,24,7,23,7,13,8,12,8,12,9,15,7,14,7,5,3,5,4,8,5,7,4,6,3,2,4,3,12,5,12,5,11,7,10,6,11,7,13,4,13,4,16,4,15,6,15,15,14,14,12,12,13,12,14,13,15,10,12,15,3,17,3,24,5,24,4,22,6,16,4,15,4,14,4,17,4,18,4,19,4,19,2,14,2,26,8,27,4,25,15,26,15,25,13,24,10,24,11,23,8,23,13,17,9,16,9,16,10,10,8,17,5,13,5,12,6,3,7,4,8,8,7,21,16,22,15
+
+                }; // fixed
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1], gray);
+                boxes.add(b);
+            }
+
+            int[] lvl = {19,10}; // boxes
+            for (int i = 0; i < lvl.length; i+=2) {
+                Box b = new Box(lvl[i], lvl[i+1]);
+                boxes.add(b);
+            }
+
+            player = new SnakePlayer(5, 10);
+            outer = new Border(2, 2, 26, 16, white);
+            inner = new Border(18,10, 1, 1, red);
+            state += 1;
+        } else if (state >= 3) checkProgress();
     } else if (level == 14) {
         println('wip');
     } else if (level == 15) {
@@ -695,7 +717,7 @@ class Player extends Rectangle {
             // check if on ice
             while (inBorder(new Box(x+xdiff, y+ydiff), outer) && rectangleOnIce(this) && moveBoxes(x, y, xdiff, ydiff)) {
                 if (getBg(x, y) != null && (getBg(x, y).c == coil_ice || getBg(x, y).c == passage)) { boxes.add(new Box(x, y, gray)); }
-                x += xdiff
+                x += xdiff;
                 y += ydiff;
             }
         }
@@ -752,6 +774,34 @@ class BulkyPlayer extends Player {
         if (movement) {
             if (boxThere(b1.x, b1.y)) getBox(b1.x, b1.y).move(xdiff, ydiff);
             if (boxThere(b2.x, b2.y)) getBox(b2.x, b2.y).move(xdiff, ydiff);
+            x += xdiff;
+            y += ydiff;
+        }
+    }
+}
+
+class SnakePlayer extends Player {
+    SnakePlayer(int _x, int _y) {
+        super(_x, _y);
+    }
+
+    void move(int xdiff, int ydiff) {
+        x_save = x;
+        y_save = y;
+        if (!inBorder(new Box(x+xdiff, y+ydiff), outer)) {
+            while (inBorder(new Box(x, y), outer)) {
+                x -= xdiff;
+                y -= ydiff;
+            }
+            x += xdiff;
+            y += ydiff;
+            // invalid move
+            if (boxThere(x, y)) {
+                x = x_save;
+                y = y_save;
+            }
+        }
+        else if (moveBoxes(x, y, xdiff, ydiff)) {
             x += xdiff;
             y += ydiff;
         }
