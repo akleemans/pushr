@@ -596,7 +596,6 @@ void showEnding(String s, float i, float j) {
     if (state == 11) m = 10;
     
     if (frameCount >= outroFC + m*30) state += 1;
-    println("state:" + state);
 }
 
 /* Check if key has been pressed. */
